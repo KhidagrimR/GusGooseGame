@@ -29,3 +29,7 @@ function love.draw()
 	Map:draw(0, 0, CONS.scale, CONS.scale)
 	Player:draw()
 end
+
+function love.keypressed(key)
+	Player:move(1)
+end
