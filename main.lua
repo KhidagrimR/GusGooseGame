@@ -26,10 +26,12 @@ end
 
 function love.draw()
 	love.graphics.draw(background)
-	Map:draw(0, 0, CONS.scale, CONS.scale)
+	Map:draw(0, 0, 2, 2)
 	Player:draw()
+	Grid:draw()
 end
 
 function love.keypressed(key)
+	print("-- Key Pressed --")
 	Player:move(1)
 end
