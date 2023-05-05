@@ -1,22 +1,18 @@
--- module pour utiliser les maps faites sur tiled
-local STI = require("sti")
-require("player")
-require("grid")
-
 --for pixel art
-love.graphics.setDefaultFilter("nearest","nearest")
+require("bullet")
+require("bulletManager")
+require("player")
+
+
+love.graphics.setDefaultFilter("nearest", "nearest")
 
 
 function love.load()
-	-- get map
-	Map = STI("map/map.lua", {"box2d"})
-
 	background = love.graphics.newImage("assets/background.png")
 	loadAll()
 end
 
 function loadAll()
-	Grid:load()
 	Player:load()
 end
 
@@ -25,13 +21,21 @@ function love.update(dt)
 end
 
 function love.draw()
+	love.graphics.push()
+	love.graphics.scale(4, 4)
+
 	love.graphics.draw(background)
-	Map:draw(0, 0, 2, 2)
 	Player:draw()
-	Grid:draw()
+
+	love.graphics.pop()
 end
 
 function love.keypressed(key)
 	print("-- Key Pressed --")
-	Player:move(1)
+
+	if (key == "q" or key == "left") then
+		Player:shootLeft()
+	elseif (key == "d" or key == "right") then
+		Player:shootRight()
+	end
 end

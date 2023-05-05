@@ -1,6 +1,5 @@
 CONS = {}
-CONS.layersName = {}
-CONS.layersName.start = "Start"
+
 
 function love.conf(t)
     t.title = "Gus goose game"

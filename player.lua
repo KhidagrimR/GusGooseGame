@@ -1,53 +1,126 @@
 Player = {}
 
 function Player:load()
-    self.x = 0
-    self.y = 0
-    self.width = Grid.info.playerWidth
-    self.height = Grid.info.playerHeight
+    self.sprite = love.graphics.newImage("assets/player/goose.png")
 
+    self.x = 150
+    self.y = 128
+    self.width = 32
+    self.height = 32
+
+    self.direction = "left"
     self.state = "idle"
+    self.isShooting = false
 
-    self.targetTile = {}
-    self.targetTile.x = 0
-    self.targetTile.y = 0
+    self.weapon = {}
+    self.weapon.coolDownDuration = 0.5
+    self.weapon.coolDownDurationTimer = 0
 
-    self.previousTile = {}
-    self.previousTile.x = 0
-    self.previousTile.y = 0
+    self:loadAssets()
+end
 
-    self.currentTile = {}
-    self.currentTile.x = 0
-    self.currentTile.y = 0
+function Player:loadAssets()
+    self.animation = { timer = 0, rate = 0.1 }
 
-    Grid:movePlayerToPosition(Grid.info.playerStartX,Grid.info.playerStartY)
+    -- IDLE
+    self.animation.idle = { total = 4, current = 1, img = {} }
+    for i = 1, self.animation.idle.total do
+        self.animation.idle.img[i] = love.graphics.newImage("assets/player/idle/" .. i .. ".png")
+    end
+
+    -- SHOOT
+    self.animation.shoot = { total = 4, current = 1, img = {} }
+    for i = 1, self.animation.shoot.total do
+        self.animation.shoot.img[i] = love.graphics.newImage("assets/player/shoot/" .. i .. ".png")
+    end
+
+    -- RELOAD
+    --self.animation.reload = {total = 2, current = 1, img = {}}
+    --for i=1, self.animation.reload.total do
+    --self.animation.reload.img[i] = love.graphics.newImage("assets/player/reload/"..i..".png")
+    --end
+
+    self.animation.draw = self.animation.idle.img[1]
+    self.animation.width = self.animation.draw:getWidth()
+    self.animation.height = self.animation.draw:getHeight()
 end
 
 function Player:update(dt)
-   --print("player X and Y = "..self.x.." , "..self.y)
+    self:setState()
+    self:animate(dt)
+
+    if self.isShooting == true then
+        self:coolDownShoot(dt)
+    end
 end
 
-function Player:move(amount)
-   for i = 1, amount, 1 do
-      Player:move()
-   end
+function Player:animate(dt)
+    self.animation.timer = self.animation.timer + dt
+    if self.animation.timer > self.animation.rate then
+        self.animation.timer = 0
+        self:setNewFrame()
+    end
 end
 
-function Player:move()
-   self:findAdjacentTile()
-
-   self.previousTile.x = self.x
-   self.previousTile.y = self.y
-
-   Grid:movePlayerToPosition(self.targetTile.x, self.targetTile.y)
-   --print("Player moved to x = "..self.x.." , y = "..self.y)
+function Player:setNewFrame()
+    local anim = self.animation[self.state]
+    if anim.current < anim.total then
+        anim.current = anim.current + 1
+    else
+        anim.current = 1
+    end
+    self.animation.draw = anim.img[anim.current]
 end
 
-function Player:findAdjacentTile()
-   self.targetTile.x, self.targetTile.y = Grid:findAdjacentTile(self.currentTile.x, self.currentTile.y, self.previousTile.x, self.previousTile.y)
-   print("Target tile position are : "..self.targetTile.x.." , "..self.targetTile.y)
+function Player:setState()
+    if self.isShooting then
+        self.state = "shoot"
+    else
+        self.state = "idle"
+    end
+end
+
+function Player:coolDownShoot(dt)
+    if self.weapon.coolDownDurationTimer > 0 then
+        self.weapon.coolDownDurationTimer = self.weapon.coolDownDurationTimer - dt
+    else
+        self.isShooting = false
+        self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
+    end
+end
+
+function Player:shootRight()
+    if self.isShooting == true then return end
+
+    self.isShooting = true
+    self.direction = "right"
+    self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
+
+    --add bullets
+    BulletManager.spawnBullet(self.direction)
+end
+
+function Player:shootLeft()
+    if self.isShooting == true then return end
+
+    self.isShooting = true
+    self.direction = "left"
+    self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
+
+    --add bullets
+    BulletManager.spawnBullet(self.direction)
 end
 
 function Player:draw()
-   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+    local scaleX = 1
+    if self.direction == "right" then
+        scaleX = -1
+    end
+    love.graphics.rectangle("fill", self.x, self.y, self.animation.width / 2, self.animation.height / 2)
+    love.graphics.draw(self.animation.draw, self.x, self.y, 0, scaleX, 1, self.animation.width / 2,
+        self.animation.height / 2)
+end
+
+function Player:SpawnBullet()
+    BulletManager:SpawnBullet(self.direction)
 end
