@@ -1,23 +1,22 @@
 --for pixel art
-require("bullet")
 require("bulletManager")
 require("player")
-
+require("bullet")
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
-
 function love.load()
 	background = love.graphics.newImage("assets/background.png")
-	loadAll()
-end
 
-function loadAll()
 	Player:load()
+	BulletManager:load()
+
+	print("ALL Manager Loaded")
 end
 
 function love.update(dt)
 	Player:update(dt)
+	BulletManager:update(dt)
 end
 
 function love.draw()
@@ -26,6 +25,7 @@ function love.draw()
 
 	love.graphics.draw(background)
 	Player:draw()
+	BulletManager:draw()
 
 	love.graphics.pop()
 end

@@ -17,6 +17,7 @@ function Player:load()
     self.weapon.coolDownDurationTimer = 0
 
     self:loadAssets()
+    print("Player Manager Loaded")
 end
 
 function Player:loadAssets()
@@ -90,25 +91,29 @@ function Player:coolDownShoot(dt)
 end
 
 function Player:shootRight()
-    if self.isShooting == true then return end
+    if self.isShooting == true then 
+        return 
+    end
 
     self.isShooting = true
     self.direction = "right"
     self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
 
     --add bullets
-    BulletManager.spawnBullet(self.direction)
+    BulletManager:spawnBullet(self.direction)
 end
 
 function Player:shootLeft()
-    if self.isShooting == true then return end
+    if self.isShooting == true then 
+        return 
+    end
 
     self.isShooting = true
     self.direction = "left"
     self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
 
     --add bullets
-    BulletManager.spawnBullet(self.direction)
+    BulletManager:spawnBullet(self.direction)
 end
 
 function Player:draw()
@@ -116,11 +121,7 @@ function Player:draw()
     if self.direction == "right" then
         scaleX = -1
     end
-    love.graphics.rectangle("fill", self.x, self.y, self.animation.width / 2, self.animation.height / 2)
+    love.graphics.rectangle("fill", self.x, self.y, scaleX * self.animation.width / 2, self.animation.height / 2)
     love.graphics.draw(self.animation.draw, self.x, self.y, 0, scaleX, 1, self.animation.width / 2,
         self.animation.height / 2)
-end
-
-function Player:SpawnBullet()
-    BulletManager:SpawnBullet(self.direction)
 end

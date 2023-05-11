@@ -1,22 +1,44 @@
-
 BulletManager = {}
 
 function BulletManager:load()
 	self.bulletLifeSpan = 2
-    self.bulletSpeed = 1
+    self.bulletSpeed = 50
     self.bullets = {}
-    self.index = 1
+    self.bulletIndex = 1
+    self.bulletMaxSpawnAngleDegree = 45 -- in degree
+
+    self.bulletSpawnOffset = {}
+    self.bulletSpawnOffset.x = 15
+    self.bulletSpawnOffset.y = 0
+
+    print("Bullet Manager Loaded")
 end
 
 function BulletManager:spawnBullet(direction)
     local dir = 1
+    local angle
 
-    if direction == "left" then dir = 1
-    else dir = -1
+    if direction == "left" then 
+        dir = -1
+        angle =  math.random(-self.bulletMaxSpawnAngleDegree, self.bulletMaxSpawnAngleDegree)
+    else 
+        dir = 1
+        angle = math.random(-self.bulletMaxSpawnAngleDegree, self.bulletMaxSpawnAngleDegree)
     end
 
-    self.bullets[self.index] = Bullet.new(self.index, Player.x, Player.y, dir)
-    self.index = self.index + 1
+    angle = angle * (math.pi / 180) -- to convert in radiant
+
+    print("Attempt to create a bullet : "..self.bulletIndex.." on coordinate ("..Player.x.." , "..Player.y..") with direction toward : "..dir)
+
+
+    self.bullets[self.bulletIndex] = 
+        Bullet.new(self.bulletIndex, Player.x + (self.bulletSpawnOffset.x * dir), Player.y + self.bulletSpawnOffset.y, dir, angle)
+    
+    self.bulletIndex = self.bulletIndex + 1
+end
+
+function BulletManager:test()
+    print("hello on "..self.bulletIndex)
 end
 
 
@@ -25,20 +47,26 @@ function BulletManager:update(dt)
 end
 
 function BulletManager:updateBullets(dt)
-    for i = 1, self.bullets.getn(), 1 do
-        self.bullets[i].update(dt)
+
+    for i = 1, #self.bullets, 1 do -- #self.bullets = table.length
+        self.bullets[i]:update(dt)
     end
 end
 
 
 
-function BulletManager:removeBullet(index)
-
+function BulletManager:removeBullet(p_bulletIndex)
+    print("bullet removed : "..p_bulletIndex)
+    self.bullets[p_bulletIndex] = nil
+    print("amount of bullet in table : "..#self.bullets)
 end
 
 
 function BulletManager:draw()
     -- for each bullet, call bullet draw
+    for i = 1, #self.bullets, 1 do -- #self.bullets = table.length
+        self.bullets[i]:draw()
+    end
 end
 
 
