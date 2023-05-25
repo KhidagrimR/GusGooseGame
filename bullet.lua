@@ -19,21 +19,22 @@ function Bullet.new(bulletIndex, startingX, startingY, direction, angle)
     instance.angle = angle
 
     print("Name : "..bulletIndex)
-    print(instance.direction)
+    print("Direction = "..instance.direction)
 
     return instance
 end
 
 function Bullet:update(dt)
     self:move(dt)
-    --self:reduceLifeSpan(dt)
+    self:reduceLifeSpan(dt)
 end
 
 function Bullet:reduceLifeSpan(dt)
     self.lifeSpanTimer = self.lifeSpanTimer - dt
 
     if self.lifeSpanTimer <= 0 then
-        BulletManager:removeBullet(self.nameIndex)        
+        --self.speed = 0
+        BulletManager:removeBullet(self.nameIndex)  
     end
 end
 
@@ -43,7 +44,6 @@ function Bullet:move(dt)
 end
 
 function Bullet:draw() 
-
-    love.graphics.rectangle("fill", self.x, self.y, self.direction * self.width / 2, self.height / 2)
+    --love.graphics.rectangle("fill", self.x, self.y, self.direction * self.width / 2, self.height / 2)
     love.graphics.draw(self.sprite, self.x - (self.width / 2) * self.direction , self.y - self.height / 2, self.angle, self.direction, 1)
 end
