@@ -2,23 +2,27 @@
 Enemy = {}
 Enemy.__index = Enemy
 
-function Enemy.new(enemyIndex, startingX, startingY, direction)
+function Enemy.new(enemyIndex, startingX, startingY, direction, spriteFolder, spriteName, hp, speed, jumpStr,
+                   jumpTimerMin, jumpTimerMax)
     local instance = setmetatable({}, Enemy)
     instance.nameIndex = enemyIndex
-    instance.sprite = love.graphics.newImage("assets/slimes/greeSlime.png")
+    instance.sprite = love.graphics.newImage("assets/slimes/" .. spriteFolder .. "/" .. spriteName .. ".png")
 
     instance.x = startingX
     instance.y = startingY
     instance.width = 16
     instance.height = 16
-    instance.speed = 50
-    instance.hp = 4
+    instance.speed = speed --50
+    instance.hp = hp       --4
+
+    instance.spriteFolder = spriteFolder
+    instance.spriteName = spriteName
 
     instance.xVel = 0
     instance.yVel = 0
     instance.gravity = 500
-    instance.jumpStr = -200
-    instance.jumpTimerCooldown = love.math.random(3,6)
+    instance.jumpStr = jumpStr                                               -- -200
+    instance.jumpTimerCooldown = love.math.random(jumpTimerMin, jumpTimerMax) -- 3 and 6
     instance.jumpTimer = instance.jumpTimerCooldown
 
     instance.isGrounded = false
@@ -26,7 +30,7 @@ function Enemy.new(enemyIndex, startingX, startingY, direction)
 
     instance.direction = direction
 
-    print("New enemy added on position : "..instance.x.." and "..instance.y)
+    print("New enemy added on position : " .. instance.x .. " and " .. instance.y)
     instance:loadAssets()
     return instance
 end
@@ -37,13 +41,15 @@ function Enemy:loadAssets()
     -- IDLE
     self.animation.idle = { total = 4, current = 1, img = {} }
     for i = 1, self.animation.idle.total do
-        self.animation.idle.img[i] = love.graphics.newImage("assets/slimes/greeSlime_walk" .. i .. ".png")
+        self.animation.idle.img[i] = love.graphics.newImage("assets/slimes/" ..
+        self.spriteFolder .. "/" .. self.spriteName .. "_walk" .. i .. ".png")
     end
 
     -- JUMP
     self.animation.jump = { total = 2, current = 1, img = {} }
     for i = 1, self.animation.jump.total do
-        self.animation.jump.img[i] = love.graphics.newImage("assets/slimes/greeSlime_jump" .. i .. ".png")
+        self.animation.jump.img[i] = love.graphics.newImage("assets/slimes/" ..
+        self.spriteFolder .. "/" .. self.spriteName .. "_jump" .. i .. ".png")
     end
 
     self.animation.draw = self.animation.idle.img[1]
@@ -86,19 +92,19 @@ function Enemy:move(dt)
         self.x = self.x + self.speed * self.direction * dt
     end
     self.y = self.y + self.yVel * dt
-    
 end
 
-function Enemy:draw() 
+function Enemy:draw()
     --love.graphics.rectangle("fill", self.x, self.y, self.direction * self.width / 2, self.height / 2)
     --love.graphics.draw(self.sprite, self.x - (self.width / 2) * self.direction , self.y - self.height / 2, 0, self.direction, 1)
-    love.graphics.draw(self.animation.draw, self.x - (self.animation.width / 2) * self.direction, self.y - self.animation.height / 2, 0, self.direction, 1)
+    love.graphics.draw(self.animation.draw, self.x - (self.animation.width / 2) * self.direction,
+        self.y - self.animation.height / 2, 0, self.direction, 1)
 end
 
 function Enemy:applyGravity(dt)
     if not self.isGrounded then
         self.yVel = self.yVel + self.gravity * dt
-     end
+    end
 end
 
 function Enemy:jumpTimerUpdate(dt)
@@ -111,9 +117,8 @@ function Enemy:jumpTimerUpdate(dt)
 end
 
 function Enemy:jump()
-    print("jump called")
     if self.isGrounded then
-        print("jump applied")
+        --print("jump applied")
         self.yVel = self.yVel + self.jumpStr
         self.isGrounded = false;
     end

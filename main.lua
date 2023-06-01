@@ -42,6 +42,8 @@ end
 
 
 function love.draw()
+	shakeScreenDraw()
+
 	love.graphics.push()
 	love.graphics.scale(4, 4)
 
@@ -49,7 +51,6 @@ function love.draw()
 	Player:draw()
 	BulletManager:draw()
 	EnemyManager:draw()
-	shakeScreenDraw()
 
 	love.graphics.pop()
 end
@@ -59,10 +60,8 @@ function love.keypressed(key)
 
 	if (key == "q" or key == "left") then
 		Player:shootLeft()
-		startShake()
 	elseif (key == "d" or key == "right") then
 		Player:shootRight()
-		startShake()
 	end
 end
 

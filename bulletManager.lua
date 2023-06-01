@@ -77,7 +77,8 @@ function BulletManager:removeBullet(p_bulletNameIndex)
     end
 
     if self.bullets[bulletToRemoveIndex] ~= nil then
-        self.bullets[bulletToRemoveIndex] = nil
+        --self.bullets[bulletToRemoveIndex] = nil
+        table.remove(self.bullets, bulletToRemoveIndex)
     end
     
     print("amount of bullet in table : "..#self.bullets)

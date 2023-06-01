@@ -4,7 +4,7 @@ function Player:load()
     self.sprite = love.graphics.newImage("assets/player/goose.png")
 
     self.x = 150
-    self.y = 128
+    self.y = 130
     self.width = 32
     self.height = 32
 
@@ -15,7 +15,7 @@ function Player:load()
     self.weapon = {}
     self.weapon.coolDownDuration = 0.5
     self.weapon.coolDownDurationTimer = 0
-    self.weapon.amountOfBulletPerShot = 1
+    self.weapon.amountOfBulletPerShot = 2
 
     self:loadAssets()
     print("Player Manager Loaded")
@@ -100,6 +100,8 @@ function Player:shootRight()
     self.direction = "right"
     self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
 
+    startShake(0.2)
+
     --add bullets
     for i = 1, self.weapon.amountOfBulletPerShot, 1 do
         BulletManager:spawnBullet(self.direction)
@@ -114,6 +116,8 @@ function Player:shootLeft()
     self.isShooting = true
     self.direction = "left"
     self.weapon.coolDownDurationTimer = self.weapon.coolDownDuration
+
+    startShake(0.2)
 
     --add bullets
     for i = 1, self.weapon.amountOfBulletPerShot, 1 do
