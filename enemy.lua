@@ -21,7 +21,7 @@ function Enemy.new(enemyIndex, startingX, startingY, direction, spriteFolder, sp
     instance.xVel = 0
     instance.yVel = 0
     instance.gravity = 500
-    instance.jumpStr = jumpStr                                               -- -200
+    instance.jumpStr = jumpStr                                                -- -200
     instance.jumpTimerCooldown = love.math.random(jumpTimerMin, jumpTimerMax) -- 3 and 6
     instance.jumpTimer = instance.jumpTimerCooldown
 
@@ -42,14 +42,14 @@ function Enemy:loadAssets()
     self.animation.idle = { total = 4, current = 1, img = {} }
     for i = 1, self.animation.idle.total do
         self.animation.idle.img[i] = love.graphics.newImage("assets/slimes/" ..
-        self.spriteFolder .. "/" .. self.spriteName .. "_walk" .. i .. ".png")
+            self.spriteFolder .. "/" .. self.spriteName .. "_walk" .. i .. ".png")
     end
 
     -- JUMP
     self.animation.jump = { total = 2, current = 1, img = {} }
     for i = 1, self.animation.jump.total do
         self.animation.jump.img[i] = love.graphics.newImage("assets/slimes/" ..
-        self.spriteFolder .. "/" .. self.spriteName .. "_jump" .. i .. ".png")
+            self.spriteFolder .. "/" .. self.spriteName .. "_jump" .. i .. ".png")
     end
 
     self.animation.draw = self.animation.idle.img[1]
@@ -141,6 +141,14 @@ end
 
 function Enemy:checkIfAlive()
     if self.hp <= 0 then
+        Enemy.die(self)
         EnemyManager:removeEnemy(self.nameIndex)
     end
+end
+
+function Enemy:die()
+    local position = {x = self.x, y = self.y}
+    print("selfx ="..self.hp )
+
+    BulletManager:spawnParticles(position, self.direction, 1)
 end

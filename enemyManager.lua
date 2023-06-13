@@ -12,6 +12,10 @@ function EnemyManager:load()
     self.spawnPoint.point1X = 10
     self.spawnPoint.point2X = 280
 
+
+    self.sound = love.audio.newSource("assets/musics/SlimeDeath.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
+    self.sound:setVolume(0.1)
+
     print("Enemy Manager Loaded")
 end
 
@@ -80,6 +84,9 @@ end
 
 function EnemyManager:removeEnemy(p_enemyNameIndex)
     print("enemy removed : " .. p_enemyNameIndex)
+    self.sound:stop()
+    self.sound:play()
+    UIManager.playerScore = UIManager.playerScore +1
     local enemyToRemoveIndex = nil
     for i = 1, #self.enemies, 1 do
         if self.enemies[i] ~= nil then

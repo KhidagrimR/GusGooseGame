@@ -8,12 +8,15 @@ function Player:load()
     self.width = 32
     self.height = 32
 
+    self.hp = 3
+
     self.direction = "left"
     self.state = "idle"
     self.isShooting = false
 
     self.weapon = {}
-    self.weapon.coolDownDuration = 0.5
+    self.weapon.startingCoolDownDuration = 0.5
+    self.weapon.coolDownDuration = self.weapon.startingCoolDownDuration
     self.weapon.coolDownDurationTimer = 0
     self.weapon.amountOfBulletPerShot = 2
 
@@ -36,6 +39,12 @@ function Player:loadAssets()
         self.animation.shoot.img[i] = love.graphics.newImage("assets/player/shoot/" .. i .. ".png")
     end
 
+    -- DEATH
+    self.animation.death = {total = 2, current = 1, img = {} }
+    for i = 1, self.animation.death.total do
+        self.animation.death.img[i] = love.graphics.newImage("assets/player/death/" .. i .. ".png")
+    end
+
     -- RELOAD
     --self.animation.reload = {total = 2, current = 1, img = {}}
     --for i=1, self.animation.reload.total do
@@ -48,11 +57,25 @@ function Player:loadAssets()
 end
 
 function Player:update(dt)
-    self:setState()
     self:animate(dt)
+    if self.state == "death" then
+        return
+    end
+
+    self:setState()
 
     if self.isShooting == true then
         self:coolDownShoot(dt)
+    end
+end
+
+function Player:getHit()
+    self.hp = self.hp - 1
+
+    if self.hp <= 0 then
+        self.isShooting = true
+        self.state = "death"
+        UIManager:endGame()
     end
 end
 
@@ -92,8 +115,8 @@ function Player:coolDownShoot(dt)
 end
 
 function Player:shootRight()
-    if self.isShooting == true then 
-        return 
+    if self.isShooting == true then
+        return
     end
 
     self.isShooting = true
@@ -109,8 +132,8 @@ function Player:shootRight()
 end
 
 function Player:shootLeft()
-    if self.isShooting == true then 
-        return 
+    if self.isShooting == true then
+        return
     end
 
     self.isShooting = true
@@ -131,6 +154,6 @@ function Player:draw()
         scaleX = -1
     end
     --love.graphics.rectangle("fill", self.x, self.y, scaleX * self.animation.width / 2, self.animation.height / 2)
-    love.graphics.draw(self.animation.draw, self.x, self.y, 0, scaleX, 1, self.animation.width / 2,
+    love.graphics.draw(self.animation.draw, self.x + 12, self.y, 0, scaleX, 1, self.animation.width / 2,
         self.animation.height / 2)
 end
