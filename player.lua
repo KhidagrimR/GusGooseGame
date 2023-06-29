@@ -4,7 +4,7 @@ function Player:load()
     self.sprite = love.graphics.newImage("assets/player/goose.png")
 
     self.x = 150
-    self.y = 130
+    self.y = 132
     self.width = 16--32
     self.height = 32
 
@@ -28,7 +28,7 @@ function Player:load()
     self.weapon.amountOfBulletPerShot = 2
 
     self.hurtSound = love.audio.newSource("assets/musics/hurt.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
-    self.hurtSound:setVolume(0.4)
+    self.hurtSound:setVolume(0.5)
 
     self:loadAssets()
     print("Player Manager Loaded")
