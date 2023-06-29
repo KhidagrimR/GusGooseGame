@@ -3,7 +3,7 @@ Enemy = {}
 Enemy.__index = Enemy
 
 function Enemy.new(enemyIndex, startingX, startingY, direction, spriteFolder, spriteName, hp, speed, jumpStr,
-                   jumpTimerMin, jumpTimerMax)
+                   jumpTimerMin, jumpTimerMax, funcOnDeath)
     local instance = setmetatable({}, Enemy)
     instance.nameIndex = enemyIndex
     instance.sprite = love.graphics.newImage("assets/slimes/" .. spriteFolder .. "/" .. spriteName .. ".png")
@@ -14,6 +14,8 @@ function Enemy.new(enemyIndex, startingX, startingY, direction, spriteFolder, sp
     instance.height = 16
     instance.speed = speed --50
     instance.hp = hp       --4
+
+    instance.damages = 1
 
     instance.spriteFolder = spriteFolder
     instance.spriteName = spriteName
@@ -26,9 +28,14 @@ function Enemy.new(enemyIndex, startingX, startingY, direction, spriteFolder, sp
     instance.jumpTimer = instance.jumpTimerCooldown
 
     instance.isGrounded = false
+    instance.groundOffset = 0
     instance.state = "idle"
 
+    instance.onHitFuntion = nil
+
     instance.direction = direction
+
+    instance.onDeath = funcOnDeath or function() print("this button has no function attached") end
 
     print("New enemy added on position : " .. instance.x .. " and " .. instance.y)
     instance:loadAssets()
@@ -125,7 +132,7 @@ function Enemy:jump()
 end
 
 function Enemy:detectGround()
-    if self.y >= CONS.groundPos then
+    if self.y >= CONS.groundPos + self.groundOffset then
         self.isGrounded = true
         self.yVel = 0
         self.state = "idle"
@@ -136,6 +143,7 @@ function Enemy:detectGround()
 end
 
 function Enemy:loseLife(amount)
+    self:onHit()
     self.hp = self.hp - amount
 end
 
@@ -150,5 +158,17 @@ function Enemy:die()
     local position = {x = self.x, y = self.y}
     print("selfx ="..self.hp )
 
+    self:onDeath();
+
     BulletManager:spawnParticles(position, self.direction, 1)
+end
+
+function Enemy:onHit()
+    if self.onHitFuntion then
+        self.onHitFuntion()
+    end
+end
+
+function Enemy:goBack()
+    self.x = self.x - self.direction * 1
 end

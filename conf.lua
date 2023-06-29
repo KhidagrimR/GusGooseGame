@@ -7,7 +7,7 @@ CONS.groundPos = 138
 function love.conf(t)
     t.title = "Gus goose game"
     t.version = "11.3"
-    t.console = true
+    t.console = false
     t.window.width = CONS.gameWidth
     t.window.height = CONS.gameHeight
 end

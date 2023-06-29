@@ -16,6 +16,7 @@ function love.load()
 	background = love.graphics.newImage("assets/background.png")
 
 	music = love.audio.newSource("assets/musics/music1.mp3", "stream") -- the "stream" tells LÖVE to stream the file from disk, good for longer music tracks
+	musicDuration = music:getDuration()
 
 	music:play()
 	music:setVolume(0.1)
@@ -87,11 +88,14 @@ function love.mousepressed(x, y, button, istouch)
 		love.load()
 	end
 
-	if button == 1 and UIManager.playerScore >= UIManager.buttonValues.cost[UIManager.buttonValues.costIndex] then -- and UIManager.gameState == "end"
-		UIManager.playerScore = UIManager.playerScore - UIManager.buttonValues.cost[UIManager.buttonValues.costIndex]
-		UIManager.button:checkPressed(x, y, 5)                                                                  -- last param is mouse radius
-		UIManager.shopSound:play()
-		UIManager.button = UIManager:getRandomButton()
+	if UIManager.button ~= nil then
+		if button == 1 and UIManager.playerScore >= UIManager.buttonValues.cost[UIManager.buttonValues.costIndex] then -- and UIManager.gameState == "end"
+			UIManager.playerScore = UIManager.playerScore - UIManager.buttonValues.cost
+			[UIManager.buttonValues.costIndex]
+			UIManager.button:checkPressed(x, y, 5)                                                                         -- last param is mouse radius
+			UIManager.shopSound:play()
+			UIManager.button = UIManager:getRandomButton()
+		end
 	end
 end
 
@@ -110,7 +114,7 @@ function checkAllCollisions()
 
 			-- check collision with player
 			if checkCollision(EnemyManager.enemies[i], Player) then
-				Player:getHit()
+				Player:getHit(EnemyManager.enemies[i].damages)
 				EnemyManager.enemies[i]:loseLife(1000)
 			end
 		end

@@ -16,13 +16,17 @@ function BulletManager:load()
     local img = love.graphics.newImage("assets/slimes/blood/1.png")
     self.pSystem = love.graphics.newParticleSystem(img, 32)
     self.pSystem:setParticleLifetime(15, 20)
-    --self.pSystem:setLinearAcceleration(-20, -20, 20, 20)
+    self.pSystem:setLinearAcceleration(0, 0.2, 0, 0.2)
     self.pSystem:setSpeed(0)
-    --self.pSystem:setRotation(0, 20)
+    self.pSystem:setRotation(0, 20)
     --self.pSystem:setSpin(2, 5)
 
-    self.sound = love.audio.newSource("assets/musics/shotgun.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
-    self.sound:setVolume(0.1)
+    self.shotgunSound1 = love.audio.newSource("assets/musics/shotgun1.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
+    self.shotgunSound1:setVolume(0.1)
+    self.shotgunSound2 = love.audio.newSource("assets/musics/shotgun2.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
+    self.shotgunSound2:setVolume(1)
+    self.shotgunSound3 = love.audio.newSource("assets/musics/shotgun3.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
+    self.shotgunSound3:setVolume(1)
 
     print("Bullet Manager Loaded")
 end
@@ -49,8 +53,23 @@ function BulletManager:spawnBullet(direction)
         Player.y + self.bulletSpawnOffset.y, dir, angle)
 
     self.bulletIndex = self.bulletIndex + 1
-    self.sound:stop()
-    self.sound:play()
+
+    self:playRandomShotgunSound()
+end
+
+function BulletManager:playRandomShotgunSound()
+    self.shotgunSound1:stop()
+    self.shotgunSound2:stop()
+    self.shotgunSound3:stop()
+
+    local rnd = math.random(1, 3)
+    if rnd == 1 then
+        self.shotgunSound1:play()
+    elseif rnd == 2 then
+        self.shotgunSound2:play()
+    else
+        self.shotgunSound3:play()
+    end
 end
 
 function BulletManager:getNextBulletArrayIndex()
@@ -64,7 +83,7 @@ end
 
 function BulletManager:spawnParticles(position, direction, amount) -- position = {x = ..., y = ...}
     --print("position = "..position.x)
-    self.pSystem:setPosition(position.x, position.y)
+    self.pSystem:setPosition(position.x - 5, position.y - 5)
     self.pSystem:emit(amount)
 end
 

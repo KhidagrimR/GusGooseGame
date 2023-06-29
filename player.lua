@@ -5,8 +5,15 @@ function Player:load()
 
     self.x = 150
     self.y = 130
-    self.width = 32
+    self.width = 16--32
     self.height = 32
+
+    self.xVel = 0
+    self.yVel = 0
+    self.acceleration = 100
+    self.maxSpeed = 1
+    self.friction = 1500
+
 
     self.hp = 3
 
@@ -19,6 +26,9 @@ function Player:load()
     self.weapon.coolDownDuration = self.weapon.startingCoolDownDuration
     self.weapon.coolDownDurationTimer = 0
     self.weapon.amountOfBulletPerShot = 2
+
+    self.hurtSound = love.audio.newSource("assets/musics/hurt.mp3", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound effects
+    self.hurtSound:setVolume(0.4)
 
     self:loadAssets()
     print("Player Manager Loaded")
@@ -58,25 +68,70 @@ end
 
 function Player:update(dt)
     self:animate(dt)
-    if self.state == "death" then
+    if self.state == "death" or UIManager.gameState == "end" then
         return
     end
 
     self:setState()
+    self:move(dt)
+    self:clampPositionOnScreen()
 
     if self.isShooting == true then
         self:coolDownShoot(dt)
     end
 end
 
-function Player:getHit()
-    self.hp = self.hp - 1
+function Player:getHit(damages)
+    local dmg = damages or 1
+
+    self.hp = self.hp - dmg
+    self.hurtSound:play()
 
     if self.hp <= 0 then
         self.isShooting = true
         self.state = "death"
-        UIManager:endGame()
+        UIManager:endGame(false)
     end
+end
+
+function Player:move(dt)
+    if love.keyboard.isDown("d", "right") then
+       self.xVel = math.min(self.xVel + self.acceleration * dt, self.maxSpeed)
+    elseif love.keyboard.isDown("q", "left") then
+       self.xVel = math.max(self.xVel - self.acceleration * dt, -self.maxSpeed)
+    else
+       self:applyFriction(dt)
+    end
+
+    self.x = self.x + self.xVel 
+ end
+
+ function Player:clampPositionOnScreen()
+    if self.x < 15 then
+        self.x = 15
+        
+    end
+
+    if self.x > CONS.gameWidth/4 - 15 then
+        self.x = CONS.gameWidth/4 - 15
+    end
+
+ end
+
+ function Player:applyFriction(dt)
+   if self.xVel > 0 then
+      if self.xVel - self.friction * dt > 0 then
+         self.xVel = self.xVel - self.friction * dt
+      else
+         self.xVel = 0
+      end
+   elseif self.xVel < 0 then
+      if self.xVel + self.friction * dt < 0 then
+         self.xVel = self.xVel + self.friction * dt
+      else
+         self.xVel = 0
+      end
+   end
 end
 
 function Player:animate(dt)
@@ -153,7 +208,7 @@ function Player:draw()
     if self.direction == "right" then
         scaleX = -1
     end
-    --love.graphics.rectangle("fill", self.x, self.y, scaleX * self.animation.width / 2, self.animation.height / 2)
-    love.graphics.draw(self.animation.draw, self.x + 12, self.y, 0, scaleX, 1, self.animation.width / 2,
+    love.graphics.rectangle("fill", self.x, self.y, scaleX * self.width / 2, self.height / 2)
+    love.graphics.draw(self.animation.draw, self.x , self.y, 0, scaleX, 1, self.animation.width / 2,
         self.animation.height / 2)
 end
